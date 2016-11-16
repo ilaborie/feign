@@ -101,7 +101,7 @@ public class ContractWithRuntimeInjectionTest {
     public List<MethodMetadata> parseAndValidatateMetadata(Class<?> targetType) {
       List<MethodMetadata> result = super.parseAndValidatateMetadata(targetType);
       for (MethodMetadata md : result) {
-        Map<Integer, Param.Expander> indexToExpander = new LinkedHashMap<Integer, Param.Expander>();
+        Map<Integer, Param.Expander> indexToExpander = new LinkedHashMap<>();
         for (Map.Entry<Integer, Class<? extends Param.Expander>> entry : md.indexToExpanderClass().entrySet()) {
           indexToExpander.put(entry.getKey(), beanFactory.getBean(entry.getValue()));
         }

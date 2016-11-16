@@ -15,11 +15,6 @@
  */
 package feign;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-
 import feign.Logger.NoOpLogger;
 import feign.ReflectiveFeign.ParseHandlersByName;
 import feign.Request.Options;
@@ -27,6 +22,11 @@ import feign.Target.HardCodedTarget;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
 import feign.codec.ErrorDecoder;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Feign's purpose is to ease development against http apis that feign restfulness. <br> In
@@ -94,7 +94,7 @@ public abstract class Feign {
   public static class Builder {
 
     private final List<RequestInterceptor> requestInterceptors =
-        new ArrayList<RequestInterceptor>();
+            new ArrayList<>();
     private Logger.Level logLevel = Logger.Level.NONE;
     private Contract contract = new Contract.Default();
     private Client client = new Client.Default(null, null);
@@ -202,7 +202,7 @@ public abstract class Feign {
     }
 
     public <T> T target(Class<T> apiType, String url) {
-      return target(new HardCodedTarget<T>(apiType, url));
+      return target(new HardCodedTarget<>(apiType, url));
     }
 
     public <T> T target(Target<T> target) {

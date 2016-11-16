@@ -33,7 +33,7 @@ public class ResponseTest {
   public void reasonPhraseIsOptional() {
     Response response = Response.builder()
             .status(200)
-            .headers(Collections.<String, Collection<String>>emptyMap())
+            .headers(Collections.emptyMap())
             .body(new byte[0])
             .build();
 
@@ -59,7 +59,7 @@ public class ResponseTest {
   public void headerValuesWithSameNameOnlyVaryingInCaseAreMerged() {
     Map<String, Collection<String>> headersMap = new LinkedHashMap();
     headersMap.put("Set-Cookie", Arrays.asList("Cookie-A=Value", "Cookie-B=Value"));
-    headersMap.put("set-cookie", Arrays.asList("Cookie-C=Value"));
+    headersMap.put("set-cookie", Collections.singletonList("Cookie-C=Value"));
 
     Response response = Response.builder()
             .status(200)

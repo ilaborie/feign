@@ -33,6 +33,7 @@ import org.junit.runners.model.Statement;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -71,7 +72,7 @@ public class LoggerTest {
     @Parameters
     public static Iterable<Object[]> data() {
       return Arrays.asList(new Object[][]{
-          {Level.NONE, Arrays.asList()},
+          {Level.NONE, Collections.emptyList()},
           {Level.BASIC, Arrays.asList(
               "\\[SendsStuff#login\\] ---> POST http://localhost:[0-9]+/ HTTP/1.1",
               "\\[SendsStuff#login\\] <--- HTTP/1.1 200 OK \\([0-9]+ms\\)")},
@@ -156,7 +157,7 @@ public class LoggerTest {
     @Parameters
     public static Iterable<Object[]> data() {
       return Arrays.asList(new Object[][]{
-          {Level.NONE, Arrays.asList()},
+          {Level.NONE, Collections.emptyList()},
           {Level.BASIC, Arrays.asList(
               "\\[SendsStuff#login\\] ---> POST http://localhost:[0-9]+/ HTTP/1.1",
               "\\[SendsStuff#login\\] <--- HTTP/1.1 200 OK \\([0-9]+ms\\)",
@@ -213,7 +214,7 @@ public class LoggerTest {
     @Parameters
     public static Iterable<Object[]> data() {
       return Arrays.asList(new Object[][]{
-          {Level.NONE, Arrays.asList()},
+          {Level.NONE, Collections.emptyList()},
           {Level.BASIC, Arrays.asList(
               "\\[SendsStuff#login\\] ---> POST http://robofu.abc/ HTTP/1.1",
               "\\[SendsStuff#login\\] <--- ERROR UnknownHostException: robofu.abc \\([0-9]+ms\\)")},
@@ -271,7 +272,7 @@ public class LoggerTest {
     @Parameters
     public static Iterable<Object[]> data() {
       return Arrays.asList(new Object[][]{
-          {Level.NONE, Arrays.asList()},
+          {Level.NONE, Collections.emptyList()},
           {Level.BASIC, Arrays.asList(
               "\\[SendsStuff#login\\] ---> POST http://robofu.abc/ HTTP/1.1",
               "\\[SendsStuff#login\\] <--- ERROR UnknownHostException: robofu.abc \\([0-9]+ms\\)",
@@ -313,8 +314,8 @@ public class LoggerTest {
 
   private static final class RecordingLogger extends Logger implements TestRule {
 
-    private final List<String> messages = new ArrayList<String>();
-    private final List<String> expectedMessages = new ArrayList<String>();
+    private final List<String> messages = new ArrayList<>();
+    private final List<String> expectedMessages = new ArrayList<>();
 
     RecordingLogger expectMessages(List<String> expectedMessages) {
       this.expectedMessages.addAll(expectedMessages);

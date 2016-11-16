@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public class RequestTemplateTest {
    * Avoid depending on guava solely for map literals.
    */
   private static <K, V> Map<K, V> mapOf(K key, V val) {
-    Map<K, V> result = new LinkedHashMap<K, V>();
+    Map<K, V> result = new LinkedHashMap<>();
     result.put(key, val);
     return result;
   }
@@ -111,8 +112,8 @@ public class RequestTemplateTest {
 
     assertThat(template)
         .hasQueries(
-            entry("Action", asList("DescribeRegions")),
-            entry("RegionName.1", asList("eu-west-1"))
+            entry("Action", Collections.singletonList("DescribeRegions")),
+            entry("RegionName.1", Collections.singletonList("eu-west-1"))
         );
   }
 
@@ -125,7 +126,7 @@ public class RequestTemplateTest {
 
     assertThat(template)
         .hasQueries(
-            entry("Query", asList("one")),
+            entry("Query", Collections.singletonList("one")),
             entry("Queries", asList("us-east-1", "eu-west-1"))
         );
   }
@@ -138,7 +139,7 @@ public class RequestTemplateTest {
     template.resolve(mapOf("authToken", "1234"));
 
     assertThat(template)
-        .hasHeaders(entry("Auth-Token", asList("1234")));
+        .hasHeaders(entry("Auth-Token", Collections.singletonList("1234")));
   }
 
   @Test
@@ -149,7 +150,7 @@ public class RequestTemplateTest {
     template.resolve(mapOf("token", "1234"));
 
     assertThat(template)
-        .hasHeaders(entry("Authorization", asList("Bearer 1234")));
+        .hasHeaders(entry("Authorization", Collections.singletonList("Bearer 1234")));
   }
 
   @Test
@@ -160,7 +161,7 @@ public class RequestTemplateTest {
     template.resolve(mapOf("dont_expand_me", "1234"));
 
     assertThat(template)
-        .hasHeaders(entry("Encoded", asList("{{dont_expand_me}}")));
+        .hasHeaders(entry("Encoded", Collections.singletonList("{{dont_expand_me}}")));
   }
 
   /** This ensures we don't mess up vnd types */
@@ -172,7 +173,7 @@ public class RequestTemplateTest {
     template.resolve(mapOf("type", "json"));
 
     assertThat(template)
-        .hasHeaders(entry("Accept", asList("application/vnd.github.v3+json")));
+        .hasHeaders(entry("Accept", Collections.singletonList("application/vnd.github.v3+json")));
   }
 
   @Test
@@ -183,7 +184,7 @@ public class RequestTemplateTest {
     template.resolve(mapOf("var", ""));
 
     assertThat(template)
-        .hasHeaders(entry("Encoded", asList("")));
+        .hasHeaders(entry("Encoded", Collections.singletonList("")));
   }
 
   @Test
@@ -200,8 +201,8 @@ public class RequestTemplateTest {
     assertThat(template)
         .hasUrl("/domains/1001/records")
         .hasQueries(
-            entry("name", asList("denominator.io")),
-            entry("type", asList("CNAME"))
+            entry("name", Collections.singletonList("denominator.io")),
+            entry("type", Collections.singletonList("CNAME"))
         );
   }
 
@@ -217,9 +218,9 @@ public class RequestTemplateTest {
     assertThat(template)
         .hasUrl("https://host/v1.0/1234/domains/1001/records")
         .hasQueries(
-            entry("provider", asList("foo")),
-            entry("name", asList("denominator.io")),
-            entry("type", asList("CNAME"))
+            entry("provider", Collections.singletonList("foo")),
+            entry("name", Collections.singletonList("denominator.io")),
+            entry("type", Collections.singletonList("CNAME"))
         );
   }
 
@@ -242,7 +243,7 @@ public class RequestTemplateTest {
         .hasBody(
             "{\"customer_name\": \"netflix\", \"user_name\": \"denominator\", \"password\": \"password\"}")
         .hasHeaders(
-            entry("Content-Length", asList(String.valueOf(template.body().length)))
+            entry("Content-Length", Collections.singletonList(String.valueOf(template.body().length)))
         );
   }
 
@@ -282,7 +283,7 @@ public class RequestTemplateTest {
     assertThat(template)
         .hasUrl("/domains/1001/records")
         .hasQueries(
-            entry("name", asList("denominator.io"))
+            entry("name", Collections.singletonList("denominator.io"))
         );
   }
 
@@ -337,7 +338,7 @@ public class RequestTemplateTest {
     RequestTemplate template = new RequestTemplate();
 
     template.query("param[]", "value");
-    assertThat(template).hasQueries(entry("param[]", asList("value")));
+    assertThat(template).hasQueries(entry("param[]", Collections.singletonList("value")));
 
     template.query("param[]", (String[]) null);
     assertThat(template.queries()).isEmpty();
@@ -348,7 +349,7 @@ public class RequestTemplateTest {
     RequestTemplate template = new RequestTemplate().query(true, "params[]", "foo%20bar");
 
     assertThat(template.queryLine()).isEqualTo("?params[]=foo%20bar");
-    assertThat(template).hasQueries(entry("params[]", asList("foo bar")));
+    assertThat(template).hasQueries(entry("params[]", Collections.singletonList("foo bar")));
   }
 
   @Test
@@ -359,7 +360,7 @@ public class RequestTemplateTest {
 
     // We can't ensure consistent behavior, because decode("param[]") == decode("param%5B%5D")
     assertThat(template.queryLine()).isEqualTo("?params%5B%5D=not+encoded&params[]=encoded");
-    assertThat(template.queries()).doesNotContain(entry("params[]", asList("not encoded")));
-    assertThat(template.queries()).contains(entry("params[]", asList("encoded")));
+    assertThat(template.queries()).doesNotContain(entry("params[]", Collections.singletonList("not encoded")));
+    assertThat(template.queries()).contains(entry("params[]", Collections.singletonList("encoded")));
   }
 }

@@ -17,13 +17,11 @@ package feign;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
+import feign.Target.HardCodedTarget;
+import feign.codec.*;
 import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.SocketPolicy;
 import okhttp3.mockwebserver.MockWebServer;
-
-import java.util.Collection;
-import java.util.LinkedHashMap;
+import okhttp3.mockwebserver.SocketPolicy;
 import okio.Buffer;
 import org.assertj.core.api.Fail;
 import org.assertj.core.data.MapEntry;
@@ -34,21 +32,8 @@ import org.junit.rules.ExpectedException;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-
-import feign.Target.HardCodedTarget;
-import feign.codec.DecodeException;
-import feign.codec.Decoder;
-import feign.codec.EncodeException;
-import feign.codec.Encoder;
-import feign.codec.ErrorDecoder;
-import feign.codec.StringDecoder;
 
 import static feign.Util.UTF_8;
 import static feign.assertj.MockWebServerAssertions.assertThat;
@@ -133,7 +118,7 @@ public class FeignTest {
   public void bodyTypeCorrespondsWithParameterType() throws Exception {
     server.enqueue(new MockResponse().setBody("foo"));
 
-    final AtomicReference<Type> encodedType = new AtomicReference<Type>();
+    final AtomicReference<Type> encodedType = new AtomicReference<>();
     TestInterface api = new TestInterfaceBuilder()
         .encoder(new Encoder.Default() {
           @Override
@@ -212,7 +197,7 @@ public class FeignTest {
 
     TestInterface api = new TestInterfaceBuilder().target("http://localhost:" + server.getPort());
 
-    api.expand(new Date(1234l));
+    api.expand(new Date(1234L));
 
     assertThat(server.takeRequest())
         .hasPath("/?date=1234");
@@ -224,7 +209,7 @@ public class FeignTest {
 
     TestInterface api = new TestInterfaceBuilder().target("http://localhost:" + server.getPort());
 
-    api.expandList(Arrays.asList(new Date(1234l), new Date(12345l)));
+    api.expandList(Arrays.asList(new Date(1234L), new Date(12345L)));
 
     assertThat(server.takeRequest())
         .hasPath("/?date=1234&date=12345");
@@ -236,7 +221,7 @@ public class FeignTest {
 
     TestInterface api = new TestInterfaceBuilder().target("http://localhost:" + server.getPort());
 
-    api.expandList(Arrays.asList(new Date(1234l), null));
+    api.expandList(Arrays.asList(new Date(1234L), null));
 
     assertThat(server.takeRequest())
         .hasPath("/?date=1234");
@@ -248,15 +233,15 @@ public class FeignTest {
 
     TestInterface api = new TestInterfaceBuilder().target("http://localhost:" + server.getPort());
 
-    Map<String, Object> headerMap = new LinkedHashMap<String, Object>();
+    Map<String, Object> headerMap = new LinkedHashMap<>();
     headerMap.put("Content-Type", "myContent");
     headerMap.put("Custom-Header", "fooValue");
     api.headerMap(headerMap);
 
     assertThat(server.takeRequest())
             .hasHeaders(
-                    MapEntry.entry("Content-Type", Arrays.asList("myContent")),
-                    MapEntry.entry("Custom-Header", Arrays.asList("fooValue")));
+                    MapEntry.entry("Content-Type", Collections.singletonList("myContent")),
+                    MapEntry.entry("Custom-Header", Collections.singletonList("fooValue")));
   }
 
   @Test
@@ -265,15 +250,15 @@ public class FeignTest {
 
     TestInterface api = new TestInterfaceBuilder().target("http://localhost:" + server.getPort());
 
-    Map<String, Object> headerMap = new LinkedHashMap<String, Object>();
+    Map<String, Object> headerMap = new LinkedHashMap<>();
     headerMap.put("Custom-Header", "fooValue");
     api.headerMapWithHeaderAnnotations(headerMap);
 
     // header map should be additive for headers provided by annotations
     assertThat(server.takeRequest())
             .hasHeaders(
-                    MapEntry.entry("Content-Encoding", Arrays.asList("deflate")),
-                    MapEntry.entry("Custom-Header", Arrays.asList("fooValue")));
+                    MapEntry.entry("Content-Encoding", Collections.singletonList("deflate")),
+                    MapEntry.entry("Custom-Header", Collections.singletonList("fooValue")));
 
     server.enqueue(new MockResponse());
     headerMap.put("Content-Encoding", "overrideFromMap");
@@ -284,8 +269,8 @@ public class FeignTest {
     // by header map should be used
     assertThat(server.takeRequest())
             .hasHeaders(
-                    MapEntry.entry("Content-Encoding", Arrays.asList("overrideFromMap")),
-                    MapEntry.entry("Custom-Header", Arrays.asList("fooValue")));
+                    MapEntry.entry("Content-Encoding", Collections.singletonList("overrideFromMap")),
+                    MapEntry.entry("Custom-Header", Collections.singletonList("fooValue")));
   }
 
   @Test
@@ -294,7 +279,7 @@ public class FeignTest {
 
     TestInterface api = new TestInterfaceBuilder().target("http://localhost:" + server.getPort());
 
-    Map<String, Object> queryMap = new LinkedHashMap<String, Object>();
+    Map<String, Object> queryMap = new LinkedHashMap<>();
     queryMap.put("name", "alice");
     queryMap.put("fooKey", "fooValue");
     api.queryMap(queryMap);
@@ -309,7 +294,7 @@ public class FeignTest {
 
     TestInterface api = new TestInterfaceBuilder().target("http://localhost:" + server.getPort());
 
-    Map<String, Object> queryMap = new LinkedHashMap<String, Object>();
+    Map<String, Object> queryMap = new LinkedHashMap<>();
     queryMap.put("name", Arrays.asList("Alice", "Bob"));
     queryMap.put("fooKey", "fooValue");
     queryMap.put("emptyListKey", new ArrayList<String>());
@@ -326,7 +311,7 @@ public class FeignTest {
             .target("http://localhost:" + server.getPort());
 
     server.enqueue(new MockResponse());
-    Map<String, Object> queryMap = new LinkedHashMap<String, Object>();
+    Map<String, Object> queryMap = new LinkedHashMap<>();
     queryMap.put("fooKey", "fooValue");
     api.queryMapWithQueryParams("alice", queryMap);
     // query map should be expanded after built-in parameters
@@ -334,7 +319,7 @@ public class FeignTest {
             .hasPath("/?name=alice&fooKey=fooValue");
 
     server.enqueue(new MockResponse());
-    queryMap = new LinkedHashMap<String, Object>();
+    queryMap = new LinkedHashMap<>();
     queryMap.put("name", "bob");
     api.queryMapWithQueryParams("alice", queryMap);
     // query map keys take precedence over built-in parameters
@@ -342,7 +327,7 @@ public class FeignTest {
             .hasPath("/?name=bob");
 
     server.enqueue(new MockResponse());
-    queryMap = new LinkedHashMap<String, Object>();
+    queryMap = new LinkedHashMap<>();
     queryMap.put("name", null);
     api.queryMapWithQueryParams("alice", queryMap);
     // null value for a query map key removes query parameter
@@ -356,8 +341,8 @@ public class FeignTest {
 
     TestInterface api = new TestInterfaceBuilder().target("http://localhost:" + server.getPort());
 
-    Map<Object, String> queryMap = new LinkedHashMap<Object, String>();
-    queryMap.put(Integer.valueOf(42), "alice");
+    Map<Object, String> queryMap = new LinkedHashMap<>();
+    queryMap.put(42, "alice");
 
     try {
       api.queryMap((Map) queryMap);
@@ -413,12 +398,7 @@ public class FeignTest {
     server.enqueue(new MockResponse().setBody("success!"));
 
     TestInterface api = new TestInterfaceBuilder()
-        .decoder(new Decoder() {
-          @Override
-          public Object decode(Response response, Type type) {
-            return "fail";
-          }
-        }).target("http://localhost:" + server.getPort());
+        .decoder((response, type) -> "fail").target("http://localhost:" + server.getPort());
 
     assertEquals(api.post(), "fail");
   }
@@ -454,11 +434,8 @@ public class FeignTest {
     thrown.expectMessage("timeout reading POST http://");
 
     TestInterface api = new TestInterfaceBuilder()
-        .decoder(new Decoder() {
-          @Override
-          public Object decode(Response response, Type type) throws IOException {
-            throw new IOException("timeout");
-          }
+        .decoder((response, type) -> {
+          throw new IOException("timeout");
         }).target("http://localhost:" + server.getPort());
 
     api.post();
@@ -475,14 +452,7 @@ public class FeignTest {
 
     TestInterface api = Feign.builder()
       .retryer(retryer)
-      .errorDecoder(new ErrorDecoder()
-      {
-        @Override
-        public Exception decode(String methodKey, Response response)
-        {
-          return new RetryableException("play it again sam!", null);
-        }
-      }).target(TestInterface.class, "http://localhost:" + server.getPort());
+      .errorDecoder((methodKey, response) -> new RetryableException("play it again sam!", null)).target(TestInterface.class, "http://localhost:" + server.getPort());
 
     api.post();
     api.post(); // if retryer instance was reused, this statement will throw an exception
@@ -491,8 +461,8 @@ public class FeignTest {
 
   @Test
   public void whenReturnTypeIsResponseNoErrorHandling() {
-    Map<String, Collection<String>> headers = new LinkedHashMap<String, Collection<String>>();
-    headers.put("Location", Arrays.asList("http://bar.com"));
+    Map<String, Collection<String>> headers = new LinkedHashMap<>();
+    headers.put("Location", Collections.singletonList("http://bar.com"));
     final Response response = Response.builder()
             .status(302)
             .reason("Found")
@@ -501,14 +471,10 @@ public class FeignTest {
             .build();
 
     TestInterface api = Feign.builder()
-        .client(new Client() { // fake client as Client.Default follows redirects.
-          public Response execute(Request request, Request.Options options) {
-            return response;
-          }
-        })
+        .client((request, options) -> response)
         .target(TestInterface.class, "http://localhost:" + server.getPort());
 
-    assertEquals(api.response().headers().get("Location"), Arrays.asList("http://bar.com"));
+    assertEquals(api.response().headers().get("Location"), Collections.singletonList("http://bar.com"));
   }
 
   private static class MockRetryer implements Retryer
@@ -536,11 +502,8 @@ public class FeignTest {
     thrown.expect(DecodeException.class);
 
     TestInterface api = new TestInterfaceBuilder()
-        .decoder(new Decoder() {
-          @Override
-          public Object decode(Response response, Type type) throws IOException {
-            throw new RuntimeException();
-          }
+        .decoder((response, type) -> {
+          throw new RuntimeException();
         }).target("http://localhost:" + server.getPort());
 
     api.post();
@@ -554,12 +517,9 @@ public class FeignTest {
 
     TestInterface api = new TestInterfaceBuilder()
         .decode404()
-        .decoder(new Decoder() {
-          @Override
-          public Object decode(Response response, Type type) throws IOException {
-            assertEquals(404, response.status());
-            throw new NoSuchElementException();
-          }
+        .decoder((response, type) -> {
+          assertEquals(404, response.status());
+          throw new NoSuchElementException();
         }).target("http://localhost:" + server.getPort());
     api.post();
   }
@@ -570,26 +530,23 @@ public class FeignTest {
     thrown.expect(EncodeException.class);
 
     TestInterface api = new TestInterfaceBuilder()
-        .encoder(new Encoder() {
-          @Override
-          public void encode(Object object, Type bodyType, RequestTemplate template) {
-            throw new RuntimeException();
-          }
+        .encoder((object, bodyType, template) -> {
+          throw new RuntimeException();
         }).target("http://localhost:" + server.getPort());
 
-    api.body(Arrays.asList("foo"));
+    api.body(Collections.singletonList("foo"));
   }
 
   @Test
   public void equalsHashCodeAndToStringWork() {
     Target<TestInterface>
         t1 =
-        new HardCodedTarget<TestInterface>(TestInterface.class, "http://localhost:8080");
+            new HardCodedTarget<>(TestInterface.class, "http://localhost:8080");
     Target<TestInterface>
         t2 =
-        new HardCodedTarget<TestInterface>(TestInterface.class, "http://localhost:8888");
+            new HardCodedTarget<>(TestInterface.class, "http://localhost:8888");
     Target<OtherTestInterface> t3 =
-        new HardCodedTarget<OtherTestInterface>(OtherTestInterface.class, "http://localhost:8080");
+            new HardCodedTarget<>(OtherTestInterface.class, "http://localhost:8080");
     TestInterface i1 = Feign.builder().target(t1);
     TestInterface i2 = Feign.builder().target(t1);
     TestInterface i3 = Feign.builder().target(t2);
@@ -773,14 +730,11 @@ public class FeignTest {
 
     private final Feign.Builder delegate = new Feign.Builder()
         .decoder(new Decoder.Default())
-        .encoder(new Encoder() {
-          @Override
-          public void encode(Object object, Type bodyType, RequestTemplate template) {
-            if (object instanceof Map) {
-              template.body(new Gson().toJson(object));
-            } else {
-              template.body(object.toString());
-            }
+        .encoder((object, bodyType, template) -> {
+          if (object instanceof Map) {
+            template.body(new Gson().toJson(object));
+          } else {
+            template.body(object.toString());
           }
         });
 

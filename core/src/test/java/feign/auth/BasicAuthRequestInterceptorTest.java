@@ -19,6 +19,8 @@ import org.junit.Test;
 
 import feign.RequestTemplate;
 
+import java.util.Collections;
+
 import static feign.assertj.FeignAssertions.assertThat;
 import static java.util.Arrays.asList;
 import static org.assertj.core.data.MapEntry.entry;
@@ -35,7 +37,7 @@ public class BasicAuthRequestInterceptorTest {
 
     assertThat(template)
         .hasHeaders(
-            entry("Authorization", asList("Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=="))
+            entry("Authorization", Collections.singletonList("Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=="))
         );
   }
 
@@ -50,8 +52,8 @@ public class BasicAuthRequestInterceptorTest {
 
     assertThat(template)
         .hasHeaders(
-            entry("Authorization", asList(
-                "Basic SU9JT0lPSU9JT0lPSU9JT0lPSU9JT0lPSU9JT0lPSU9JT0lPSU86MTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEw"))
+            entry("Authorization", Collections.singletonList(
+                    "Basic SU9JT0lPSU9JT0lPSU9JT0lPSU9JT0lPSU9JT0lPSU9JT0lPSU86MTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEw"))
         );
   }
 }

@@ -54,7 +54,7 @@ public interface Contract {
                    "Only single-level inheritance supported: %s",
                    targetType.getSimpleName());
       }
-      Map<String, MethodMetadata> result = new LinkedHashMap<String, MethodMetadata>();
+      Map<String, MethodMetadata> result = new LinkedHashMap<>();
       for (Method method : targetType.getMethods()) {
         if (method.getDeclaringClass() == Object.class ||
             (method.getModifiers() & Modifier.STATIC) != 0 ||
@@ -66,7 +66,7 @@ public interface Contract {
                    metadata.configKey());
         result.put(metadata.configKey(), metadata);
       }
-      return new ArrayList<MethodMetadata>(result.values());
+      return new ArrayList<>(result.values());
     }
 
     /**
@@ -166,7 +166,7 @@ public interface Contract {
     // deprecated as only used in a sub-type
     protected Collection<String> addTemplatedParam(Collection<String> possiblyNull, String name) {
       if (possiblyNull == null) {
-        possiblyNull = new ArrayList<String>();
+        possiblyNull = new ArrayList<>();
       }
       possiblyNull.add(String.format("{%s}", name));
       return possiblyNull;
@@ -178,7 +178,7 @@ public interface Contract {
     protected void nameParam(MethodMetadata data, String name, int i) {
       Collection<String>
           names =
-          data.indexToName().containsKey(i) ? data.indexToName().get(i) : new ArrayList<String>();
+          data.indexToName().containsKey(i) ? data.indexToName().get(i) : new ArrayList<>();
       names.add(name);
       data.indexToName().put(i, names);
     }
@@ -282,9 +282,6 @@ public interface Contract {
     private static <K, V> boolean searchMapValuesContainsSubstring(Map<K, Collection<String>> map,
                                                                    String search) {
       Collection<Collection<String>> values = map.values();
-      if (values == null) {
-        return false;
-      }
 
       for (Collection<String> entry : values) {
         for (String value : entry) {
@@ -300,12 +297,12 @@ public interface Contract {
     private static Map<String, Collection<String>> toMap(String[] input) {
       Map<String, Collection<String>>
           result =
-          new LinkedHashMap<String, Collection<String>>(input.length);
+              new LinkedHashMap<>(input.length);
       for (String header : input) {
         int colon = header.indexOf(':');
         String name = header.substring(0, colon);
         if (!result.containsKey(name)) {
-          result.put(name, new ArrayList<String>(1));
+          result.put(name, new ArrayList<>(1));
         }
         result.get(name).add(header.substring(colon + 2));
       }

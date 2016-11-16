@@ -22,7 +22,6 @@ import java.text.ParseException;
 import feign.codec.ErrorDecoder.RetryAfterDecoder;
 
 import static feign.codec.ErrorDecoder.RetryAfterDecoder.RFC822_FORMAT;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 

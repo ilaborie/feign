@@ -15,10 +15,11 @@
  */
 package feign.auth;
 
-import java.nio.charset.Charset;
-
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+
+import java.nio.charset.Charset;
+import java.util.Base64;
 
 import static feign.Util.ISO_8859_1;
 import static feign.Util.checkNotNull;
@@ -60,7 +61,7 @@ public class BasicAuthRequestInterceptor implements RequestInterceptor {
    * response would be to pull the necessary portions of Guava's BaseEncoding class into Util.
    */
   private static String base64Encode(byte[] bytes) {
-    return Base64.encode(bytes);
+    return Base64.getEncoder().encodeToString(bytes);
   }
 
   @Override

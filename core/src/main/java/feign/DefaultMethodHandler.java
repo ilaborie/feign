@@ -30,9 +30,7 @@ final class DefaultMethodHandler implements MethodHandler {
       Lookup lookup = (Lookup) field.get(null);
 
       this.unboundHandle = lookup.unreflectSpecial(defaultMethod, declaringClass);
-    } catch (NoSuchFieldException ex) {
-      throw new IllegalStateException(ex);
-    } catch (IllegalAccessException ex) {
+    } catch (NoSuchFieldException | IllegalAccessException ex) {
       throw new IllegalStateException(ex);
     }
   }

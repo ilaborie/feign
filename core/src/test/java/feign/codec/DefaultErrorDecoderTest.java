@@ -15,17 +15,13 @@
  */
 package feign.codec;
 
+import feign.FeignException;
+import feign.Response;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import feign.FeignException;
-import feign.Response;
+import java.util.*;
 
 import static feign.Util.RETRY_AFTER;
 import static feign.Util.UTF_8;
@@ -38,7 +34,7 @@ public class DefaultErrorDecoderTest {
 
   ErrorDecoder errorDecoder = new ErrorDecoder.Default();
 
-  Map<String, Collection<String>> headers = new LinkedHashMap<String, Collection<String>>();
+  Map<String, Collection<String>> headers = new LinkedHashMap<>();
 
   @Test
   public void throwsFeignException() throws Throwable {
@@ -88,7 +84,7 @@ public class DefaultErrorDecoderTest {
     thrown.expect(FeignException.class);
     thrown.expectMessage("status 503 reading Service#foo()");
 
-    headers.put(RETRY_AFTER, Arrays.asList("Sat, 1 Jan 2000 00:00:00 GMT"));
+    headers.put(RETRY_AFTER, Collections.singletonList("Sat, 1 Jan 2000 00:00:00 GMT"));
     Response response = Response.builder()
             .status(503)
             .reason("Service Unavailable")

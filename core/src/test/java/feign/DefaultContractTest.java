@@ -23,11 +23,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.net.URI;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
+import java.util.*;
 
 import static feign.assertj.FeignAssertions.assertThat;
 import static java.util.Arrays.asList;
@@ -77,7 +73,7 @@ public class DefaultContractTest {
     assertThat(md.bodyIndex())
         .isEqualTo(1);
     assertThat(md.indexToName()).containsOnly(
-        entry(0, asList("id"))
+        entry(0, Collections.singletonList("id"))
     );
   }
 
@@ -104,30 +100,30 @@ public class DefaultContractTest {
     assertThat(parseAndValidateMetadata(WithQueryParamsInPath.class, "one").template())
         .hasUrl("/")
         .hasQueries(
-            entry("Action", asList("GetUser"))
+            entry("Action", Collections.singletonList("GetUser"))
         );
 
     assertThat(parseAndValidateMetadata(WithQueryParamsInPath.class, "two").template())
         .hasUrl("/")
         .hasQueries(
-            entry("Action", asList("GetUser")),
-            entry("Version", asList("2010-05-08"))
+            entry("Action", Collections.singletonList("GetUser")),
+            entry("Version", Collections.singletonList("2010-05-08"))
         );
 
     assertThat(parseAndValidateMetadata(WithQueryParamsInPath.class, "three").template())
         .hasUrl("/")
         .hasQueries(
-            entry("Action", asList("GetUser")),
-            entry("Version", asList("2010-05-08")),
-            entry("limit", asList("1"))
+            entry("Action", Collections.singletonList("GetUser")),
+            entry("Version", Collections.singletonList("2010-05-08")),
+            entry("limit", Collections.singletonList("1"))
         );
 
     assertThat(parseAndValidateMetadata(WithQueryParamsInPath.class, "twoAndOneEmpty").template())
         .hasUrl("/")
         .hasQueries(
             entry("flag", asList(new String[]{null})),
-            entry("Action", asList("GetUser")),
-            entry("Version", asList("2010-05-08"))
+            entry("Action", Collections.singletonList("GetUser")),
+            entry("Version", Collections.singletonList("2010-05-08"))
         );
 
     assertThat(parseAndValidateMetadata(WithQueryParamsInPath.class, "oneEmpty").template())
@@ -158,8 +154,8 @@ public class DefaultContractTest {
 
     assertThat(md.template())
         .hasHeaders(
-            entry("Content-Type", asList("application/xml")),
-            entry("Content-Length", asList(String.valueOf(md.template().body().length)))
+            entry("Content-Type", Collections.singletonList("application/xml")),
+            entry("Content-Length", Collections.singletonList(String.valueOf(md.template().body().length)))
         );
   }
 
@@ -169,8 +165,8 @@ public class DefaultContractTest {
 
     assertThat(md.template())
         .hasHeaders(
-            entry("Content-Type", asList("application/xml")),
-            entry("Content-Length", asList(String.valueOf(md.template().body().length)))
+            entry("Content-Type", Collections.singletonList("application/xml")),
+            entry("Content-Length", Collections.singletonList(String.valueOf(md.template().body().length)))
         );
   }
 
@@ -181,9 +177,9 @@ public class DefaultContractTest {
 
     assertThat(md.indexToName())
         .containsExactly(
-            entry(0, asList("1")),
+            entry(0, Collections.singletonList("1")),
             // Skips 1 as it is a url index!
-            entry(2, asList("2"))
+            entry(2, Collections.singletonList("2"))
         );
 
     assertThat(md.urlIndex()).isEqualTo(1);
@@ -196,12 +192,12 @@ public class DefaultContractTest {
                                                  String.class);
 
     assertThat(md.template())
-        .hasQueries(entry("name", asList("{name}")), entry("type", asList("{type}")));
+        .hasQueries(entry("name", Collections.singletonList("{name}")), entry("type", Collections.singletonList("{type}")));
 
     assertThat(md.indexToName()).containsExactly(
-        entry(0, asList("domainId")),
-        entry(1, asList("name")),
-        entry(2, asList("type"))
+        entry(0, Collections.singletonList("domainId")),
+        entry(1, Collections.singletonList("name")),
+        entry(2, Collections.singletonList("type"))
     );
   }
 
@@ -224,9 +220,9 @@ public class DefaultContractTest {
         .containsExactly("customer_name", "user_name", "password");
 
     assertThat(md.indexToName()).containsExactly(
-        entry(0, asList("customer_name")),
-        entry(1, asList("user_name")),
-        entry(2, asList("password"))
+        entry(0, Collections.singletonList("customer_name")),
+        entry(1, Collections.singletonList("user_name")),
+        entry(2, Collections.singletonList("password"))
     );
   }
 
@@ -249,7 +245,7 @@ public class DefaultContractTest {
         .hasHeaders(entry("Auth-Token", asList("{authToken}", "Foo")));
 
     assertThat(md.indexToName())
-        .containsExactly(entry(0, asList("authToken")));
+        .containsExactly(entry(0, Collections.singletonList("authToken")));
     assertThat(md.formParams()).isEmpty();
   }
 
@@ -261,7 +257,7 @@ public class DefaultContractTest {
         .hasHeaders(entry("Authorization", asList("Bearer {authToken}", "Foo")));
 
     assertThat(md.indexToName())
-        .containsExactly(entry(0, asList("authToken")));
+        .containsExactly(entry(0, Collections.singletonList("authToken")));
     assertThat(md.formParams()).isEmpty();
   }
 
@@ -532,7 +528,7 @@ public class DefaultContractTest {
     assertThat(md.get(0).returnType())
         .isEqualTo(String.class);
     assertThat(md.get(0).template())
-        .hasHeaders(entry("Foo", asList("Bar")));
+        .hasHeaders(entry("Foo", Collections.singletonList("Bar")));
   }
 
   @Test
@@ -606,7 +602,7 @@ public class DefaultContractTest {
   public void parameterizedBaseApi() throws Exception {
     List<MethodMetadata> md = contract.parseAndValidatateMetadata(ParameterizedApi.class);
 
-    Map<String, MethodMetadata> byConfigKey = new LinkedHashMap<String, MethodMetadata>();
+    Map<String, MethodMetadata> byConfigKey = new LinkedHashMap<>();
     for (MethodMetadata m : md) {
       byConfigKey.put(m.configKey(), m);
     }
@@ -618,8 +614,8 @@ public class DefaultContractTest {
         .isEqualTo(new TypeToken<Entity<String, Long>>() {
         }.getType());
     assertThat(byConfigKey.get("ParameterizedApi#get(String)").template()).hasHeaders(
-        entry("Version", asList("1")),
-        entry("Foo", asList("Bar"))
+        entry("Version", Collections.singletonList("1")),
+        entry("Foo", Collections.singletonList("Bar"))
     );
 
     assertThat(byConfigKey.get("ParameterizedApi#getAll(Keys)").returnType())
@@ -629,8 +625,8 @@ public class DefaultContractTest {
         .isEqualTo(new TypeToken<Keys<String>>() {
         }.getType());
     assertThat(byConfigKey.get("ParameterizedApi#getAll(Keys)").template()).hasHeaders(
-        entry("Version", asList("1")),
-        entry("Foo", asList("Bar"))
+        entry("Version", Collections.singletonList("1")),
+        entry("Foo", Collections.singletonList("Bar"))
     );
   }
 
@@ -652,7 +648,7 @@ public class DefaultContractTest {
     assertThat(md.get(0).returnType())
         .isEqualTo(String.class);
     assertThat(md.get(0).template())
-        .hasHeaders(entry("Authorization", asList("{authHdr}")), entry("Accept", asList("application/json")));
+        .hasHeaders(entry("Authorization", Collections.singletonList("{authHdr}")), entry("Accept", Collections.singletonList("application/json")));
     // Ensure that the authHdr expansion was properly detected and did not create a formParam
     assertThat(md.get(0).formParams())
         .isEmpty();
@@ -672,8 +668,8 @@ public class DefaultContractTest {
     assertThat(md.get(0).returnType())
         .isEqualTo(String.class);
     assertThat(md.get(0).template())
-        .hasHeaders(entry("Authorization", asList("Bearer {authHdr}")),
-            entry("Accept", asList("application/json")));
+        .hasHeaders(entry("Authorization", Collections.singletonList("Bearer {authHdr}")),
+            entry("Accept", Collections.singletonList("application/json")));
     // Ensure that the authHdr expansion was properly detected and did not create a formParam
     assertThat(md.get(0).formParams())
         .isEmpty();
@@ -703,7 +699,7 @@ public class DefaultContractTest {
   public void parameterizedHeaderExpandApiBaseClass() throws Exception {
     List<MethodMetadata> mds = contract.parseAndValidatateMetadata(ParameterizedHeaderExpandInheritedApi.class);
 
-    Map<String, MethodMetadata> byConfigKey = new LinkedHashMap<String, MethodMetadata>();
+    Map<String, MethodMetadata> byConfigKey = new LinkedHashMap<>();
     for (MethodMetadata m : mds) {
       byConfigKey.put(m.configKey(), m);
     }
@@ -716,7 +712,7 @@ public class DefaultContractTest {
     assertThat(md.returnType())
         .isEqualTo(String.class);
     assertThat(md.template())
-        .hasHeaders(entry("Authorization", asList("{authHdr}")), entry("Accept", asList("application/json")));
+        .hasHeaders(entry("Authorization", Collections.singletonList("{authHdr}")), entry("Accept", Collections.singletonList("application/json")));
     // Ensure that the authHdr expansion was properly detected and did not create a formParam
     assertThat(md.formParams())
         .isEmpty();
@@ -725,7 +721,7 @@ public class DefaultContractTest {
     assertThat(md.returnType())
         .isEqualTo(String.class);
     assertThat(md.template())
-        .hasHeaders(entry("Authorization", asList("{authHdr}")));
+        .hasHeaders(entry("Authorization", Collections.singletonList("{authHdr}")));
     assertThat(md.formParams())
         .isEmpty();
   }
@@ -795,7 +791,7 @@ public class DefaultContractTest {
     List<MethodMetadata> mds = contract.parseAndValidatateMetadata(SubstringQuery.class);
 
     assertThat(mds.get(0).template().queries()).containsExactly(
-        entry("q", asList("body:{body}"))
+        entry("q", Collections.singletonList("body:{body}"))
     );
     assertThat(mds.get(0).formParams()).isEmpty(); // Prevent issue 424
   }

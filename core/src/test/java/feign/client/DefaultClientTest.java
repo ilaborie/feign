@@ -39,12 +39,7 @@ import static org.junit.Assert.assertEquals;
 public class DefaultClientTest extends AbstractClientTest {
 
     Client disableHostnameVerification =
-            new Client.Default(TrustingSSLSocketFactory.get(), new HostnameVerifier() {
-                @Override
-                public boolean verify(String s, SSLSession sslSession) {
-                    return true;
-                }
-            });
+            new Client.Default(TrustingSSLSocketFactory.get(), (s, sslSession) -> true);
 
     @Override
     public Builder newBuilder() {

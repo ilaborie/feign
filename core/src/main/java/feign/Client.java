@@ -15,8 +15,11 @@
  */
 package feign;
 
-import static java.lang.String.format;
+import feign.Request.Options;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,21 +27,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
-
-import feign.Request.Options;
-
-import static feign.Util.CONTENT_ENCODING;
-import static feign.Util.CONTENT_LENGTH;
-import static feign.Util.ENCODING_DEFLATE;
-import static feign.Util.ENCODING_GZIP;
+import static feign.Util.*;
+import static java.lang.String.format;
 
 /**
  * Submits HTTP {@link Request requests}. Implementations are expected to be thread-safe.
@@ -157,13 +151,11 @@ public interface Client {
             connection.getRequestMethod(), connection.getURL()));
       }
 
-      Map<String, Collection<String>> headers = new LinkedHashMap<String, Collection<String>>();
-      for (Map.Entry<String, List<String>> field : connection.getHeaderFields().entrySet()) {
-        // response message
-        if (field.getKey() != null) {
-          headers.put(field.getKey(), field.getValue());
-        }
-      }
+      Map<String, Collection<String>> headers = new LinkedHashMap<>();
+      // response message
+      connection.getHeaderFields().entrySet().stream().filter(field -> field.getKey() != null).forEach(field -> {
+        headers.put(field.getKey(), field.getValue());
+      });
 
       Integer length = connection.getContentLength();
       if (length == -1) {

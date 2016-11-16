@@ -32,8 +32,7 @@ import static feign.Util.valuesOrEmpty;
 public abstract class Logger {
 
   protected static String methodTag(String configKey) {
-    return new StringBuilder().append('[').append(configKey.substring(0, configKey.indexOf('(')))
-        .append("] ").toString();
+    return String.format("[%s] ", configKey.substring(0, configKey.indexOf('(')));
   }
 
   /**

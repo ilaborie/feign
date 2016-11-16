@@ -48,9 +48,9 @@ public final class RequestTemplate implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private final Map<String, Collection<String>> queries =
-      new LinkedHashMap<String, Collection<String>>();
+          new LinkedHashMap<>();
   private final Map<String, Collection<String>> headers =
-      new LinkedHashMap<String, Collection<String>>();
+          new LinkedHashMap<>();
   private String method;
   /* final to encourage mutable use vs replacing the object. */
   private StringBuilder url = new StringBuilder();
@@ -162,7 +162,7 @@ public final class RequestTemplate implements Serializable {
   }
 
   private static Map<String, Collection<String>> parseAndDecodeQueries(String queryLine) {
-    Map<String, Collection<String>> map = new LinkedHashMap<String, Collection<String>>();
+    Map<String, Collection<String>> map = new LinkedHashMap<>();
     if (emptyToNull(queryLine) == null) {
       return map;
     }
@@ -195,14 +195,14 @@ public final class RequestTemplate implements Serializable {
       key = urlDecode(stringToParse.substring(0, firstEq));
       value = urlDecode(stringToParse.substring(firstEq + 1));
     }
-    Collection<String> values = map.containsKey(key) ? map.get(key) : new ArrayList<String>();
+    Collection<String> values = map.containsKey(key) ? map.get(key) : new ArrayList<>();
     values.add(value);
     map.put(key, values);
   }
 
   /** {@link #resolve(Map, Map)}, which assumes no parameter is encoded */
   public RequestTemplate resolve(Map<String, ?> unencoded) {
-    return resolve(unencoded, Collections.<String, Boolean>emptyMap());
+    return resolve(unencoded, Collections.emptyMap());
   }
 
   /**
@@ -213,7 +213,7 @@ public final class RequestTemplate implements Serializable {
    */
   RequestTemplate resolve(Map<String, ?> unencoded, Map<String, Boolean> alreadyEncoded) {
     replaceQueryValues(unencoded, alreadyEncoded);
-    Map<String, String> encoded = new LinkedHashMap<String, String>();
+    Map<String, String> encoded = new LinkedHashMap<>();
     for (Entry<String, ?> entry : unencoded.entrySet()) {
       final String key = entry.getKey();
       final Object objectValue = entry.getValue();
@@ -226,9 +226,9 @@ public final class RequestTemplate implements Serializable {
     }
     url = new StringBuilder(resolvedUrl);
 
-    Map<String, Collection<String>> resolvedHeaders = new LinkedHashMap<String, Collection<String>>();
+    Map<String, Collection<String>> resolvedHeaders = new LinkedHashMap<>();
     for (String field : headers.keySet()) {
-      Collection<String> resolvedValues = new ArrayList<String>();
+      Collection<String> resolvedValues = new ArrayList<>();
       for (String value : valuesOrEmpty(headers, field)) {
         String resolved = expand(value, unencoded);
         resolvedValues.add(resolved);
@@ -254,7 +254,7 @@ public final class RequestTemplate implements Serializable {
 
   /* roughly analogous to {@code javax.ws.rs.client.Target.request()}. */
   public Request request() {
-    Map<String, Collection<String>> safeCopy = new LinkedHashMap<String, Collection<String>>();
+    Map<String, Collection<String>> safeCopy = new LinkedHashMap<>();
     safeCopy.putAll(headers);
     return Request.create(
         method, url + queryLine(),
@@ -361,7 +361,7 @@ public final class RequestTemplate implements Serializable {
     String paramName = encoded ? name : encodeIfNotVariable(name);
     queries.remove(paramName);
     if (values != null && values.length > 0 && values[0] != null) {
-      ArrayList<String> paramValues = new ArrayList<String>();
+      ArrayList<String> paramValues = new ArrayList<>();
       for (String value : values) {
         paramValues.add(encoded ? value : encodeIfNotVariable(value));
       }
@@ -412,9 +412,9 @@ public final class RequestTemplate implements Serializable {
    * @see Request#url()
    */
   public Map<String, Collection<String>> queries() {
-    Map<String, Collection<String>> decoded = new LinkedHashMap<String, Collection<String>>();
+    Map<String, Collection<String>> decoded = new LinkedHashMap<>();
     for (String field : queries.keySet()) {
-      Collection<String> decodedValues = new ArrayList<String>();
+      Collection<String> decodedValues = new ArrayList<>();
       for (String value : valuesOrEmpty(queries, field)) {
         if (value != null) {
           decodedValues.add(urlDecode(value));
@@ -447,7 +447,7 @@ public final class RequestTemplate implements Serializable {
     if (values == null || (values.length == 1 && values[0] == null)) {
       headers.remove(name);
     } else {
-      List<String> headers = new ArrayList<String>();
+      List<String> headers = new ArrayList<>();
       headers.addAll(Arrays.asList(values));
       this.headers.put(name, headers);
     }
@@ -607,7 +607,7 @@ public final class RequestTemplate implements Serializable {
 
   /** {@link #replaceQueryValues(Map, Map)}, which assumes no parameter is encoded */
   public void replaceQueryValues(Map<String, ?> unencoded) {
-    replaceQueryValues(unencoded, Collections.<String, Boolean>emptyMap());
+    replaceQueryValues(unencoded, Collections.emptyMap());
   }
 
   /**
@@ -621,7 +621,7 @@ public final class RequestTemplate implements Serializable {
       if (entry.getValue() == null) {
         continue;
       }
-      Collection<String> values = new ArrayList<String>();
+      Collection<String> values = new ArrayList<>();
       for (String value : entry.getValue()) {
         if (value.indexOf('{') == 0 && value.indexOf('}') == value.length() - 1) {
           Object variableValue = unencoded.get(value.substring(1, value.length() - 1));

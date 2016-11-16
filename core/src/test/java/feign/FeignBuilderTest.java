@@ -35,7 +35,6 @@ import feign.codec.Encoder;
 import static feign.assertj.MockWebServerAssertions.assertThat;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class FeignBuilderTest {
 
@@ -126,12 +125,7 @@ public class FeignBuilderTest {
     server.enqueue(new MockResponse().setBody("response data"));
 
     String url = "http://localhost:" + server.getPort();
-    Encoder encoder = new Encoder() {
-      @Override
-      public void encode(Object object, Type bodyType, RequestTemplate template) {
-        template.body(object.toString());
-      }
-    };
+    Encoder encoder = (object, bodyType, template) -> template.body(object.toString());
 
     TestInterface api = Feign.builder().encoder(encoder).target(TestInterface.class, url);
     api.encodedPost(Arrays.asList("This", "is", "my", "request"));
@@ -145,12 +139,7 @@ public class FeignBuilderTest {
     server.enqueue(new MockResponse().setBody("success!"));
 
     String url = "http://localhost:" + server.getPort();
-    Decoder decoder = new Decoder() {
-      @Override
-      public Object decode(Response response, Type type) {
-        return "fail";
-      }
-    };
+    Decoder decoder = (response, type) -> "fail";
 
     TestInterface api = Feign.builder().decoder(decoder).target(TestInterface.class, url);
     assertEquals("fail", api.decodedPost());
@@ -163,12 +152,7 @@ public class FeignBuilderTest {
     server.enqueue(new MockResponse().setBody("response data"));
 
     String url = "http://localhost:" + server.getPort();
-    RequestInterceptor requestInterceptor = new RequestInterceptor() {
-      @Override
-      public void apply(RequestTemplate template) {
-        template.header("Content-Type", "text/plain");
-      }
-    };
+    RequestInterceptor requestInterceptor = template -> template.header("Content-Type", "text/plain");
 
     TestInterface api =
         Feign.builder().requestInterceptor(requestInterceptor).target(TestInterface.class, url);

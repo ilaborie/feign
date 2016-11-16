@@ -133,11 +133,11 @@ public interface Target<T> {
     }
 
     public static <T> EmptyTarget<T> create(Class<T> type) {
-      return new EmptyTarget<T>(type, "empty:" + type.getSimpleName());
+      return new EmptyTarget<>(type, "empty:" + type.getSimpleName());
     }
 
     public static <T> EmptyTarget<T> create(Class<T> type, String name) {
-      return new EmptyTarget<T>(type, name);
+      return new EmptyTarget<>(type, name);
     }
 
     @Override

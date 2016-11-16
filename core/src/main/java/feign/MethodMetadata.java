@@ -15,15 +15,11 @@
  */
 package feign;
 
+import feign.Param.Expander;
+
 import java.io.Serializable;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import feign.Param.Expander;
+import java.util.*;
 
 public final class MethodMetadata implements Serializable {
 
@@ -37,12 +33,12 @@ public final class MethodMetadata implements Serializable {
   private boolean queryMapEncoded;
   private transient Type bodyType;
   private RequestTemplate template = new RequestTemplate();
-  private List<String> formParams = new ArrayList<String>();
+  private List<String> formParams = new ArrayList<>();
   private Map<Integer, Collection<String>> indexToName =
-      new LinkedHashMap<Integer, Collection<String>>();
+          new LinkedHashMap<>();
   private Map<Integer, Class<? extends Expander>> indexToExpanderClass =
-      new LinkedHashMap<Integer, Class<? extends Expander>>();
-  private Map<Integer, Boolean> indexToEncoded = new LinkedHashMap<Integer, Boolean>();
+          new LinkedHashMap<>();
+  private Map<Integer, Boolean> indexToEncoded = new LinkedHashMap<>();
   private transient Map<Integer, Expander> indexToExpander;
 
   MethodMetadata() {

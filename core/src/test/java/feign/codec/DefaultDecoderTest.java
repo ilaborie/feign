@@ -15,6 +15,7 @@
  */
 package feign.codec;
 
+import feign.Response;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -26,8 +27,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import feign.Response;
 
 import static feign.Util.UTF_8;
 import static org.junit.Assert.assertEquals;
@@ -72,7 +71,7 @@ public class DefaultDecoderTest {
   private Response knownResponse() {
     String content = "response body";
     InputStream inputStream = new ByteArrayInputStream(content.getBytes(UTF_8));
-    Map<String, Collection<String>> headers = new HashMap<String, Collection<String>>();
+    Map<String, Collection<String>> headers = new HashMap<>();
     headers.put("Content-Type", Collections.singleton("text/plain"));
     return Response.builder()
             .status(200)
@@ -86,7 +85,7 @@ public class DefaultDecoderTest {
     return Response.builder()
             .status(200)
             .reason("OK")
-            .headers(Collections.<String, Collection<String>>emptyMap())
+            .headers(Collections.emptyMap())
             .build();
   }
 }

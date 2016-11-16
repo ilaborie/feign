@@ -1,31 +1,21 @@
 package feign.client;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
+import feign.*;
+import feign.Feign.Builder;
+import feign.assertj.MockWebServerAssertions;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import feign.Client;
-import feign.Feign.Builder;
-import feign.FeignException;
-import feign.Headers;
-import feign.Logger;
-import feign.Param;
-import feign.RequestLine;
-import feign.Response;
-import feign.Util;
-import feign.assertj.MockWebServerAssertions;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-
-import static java.util.Arrays.asList;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Collections;
 
 import static feign.Util.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 /**
  * {@link AbstractClientTest} can be extended to run a set of tests against any {@link Client} implementation.
@@ -74,8 +64,8 @@ public abstract class AbstractClientTest {
         assertThat(response.status()).isEqualTo(200);
         assertThat(response.reason()).isEqualTo("OK");
         assertThat(response.headers())
-                .containsEntry("Content-Length", asList("3"))
-                .containsEntry("Foo", asList("Bar"));
+                .containsEntry("Content-Length", Collections.singletonList("3"))
+                .containsEntry("Foo", Collections.singletonList("Bar"));
         assertThat(response.body().asInputStream())
                 .hasContentEqualTo(new ByteArrayInputStream("foo".getBytes(UTF_8)));
 
@@ -186,7 +176,7 @@ public abstract class AbstractClientTest {
         TestInterface api = newBuilder()
                 .target(TestInterface.class, "http://localhost:" + server.getPort());
 
-        Response response = api.post("current documents", "foo");
+        api.post("current documents", "foo");
 
         MockWebServerAssertions.assertThat(server.takeRequest()).hasMethod("POST")
                 .hasPath("/path/current%20documents/resource")

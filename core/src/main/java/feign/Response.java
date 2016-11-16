@@ -374,12 +374,12 @@ public final class Response implements Closeable {
   }
 
   private static Map<String, Collection<String>> caseInsensitiveCopyOf(Map<String, Collection<String>> headers) {
-    Map<String, Collection<String>> result = new TreeMap<String, Collection<String>>(String.CASE_INSENSITIVE_ORDER);
+    Map<String, Collection<String>> result = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
     for (Map.Entry<String, Collection<String>> entry : headers.entrySet()) {
       String headerName = entry.getKey();
       if (!result.containsKey(headerName)) {
-        result.put(headerName.toLowerCase(Locale.ROOT), new LinkedList<String>());
+        result.put(headerName.toLowerCase(Locale.ROOT), new LinkedList<>());
       }
       result.get(headerName).addAll(entry.getValue());
     }
